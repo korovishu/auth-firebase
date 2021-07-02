@@ -1,15 +1,44 @@
 import React,{useState} from 'react'
 import firebaseClient from '../firebaseClient'
 import firebase from 'firebase/app'
+import {useRouter} from 'next/router'
 import 'firebase/auth'
+
+const gProvider = new firebase.auth.GoogleAuthProvider();
+// localStorage.removeItem('redirectURI');
 
 export default function Login(){
     firebaseClient();
     const [email,setEmail] = useState('');
     const [pass,setPass] = useState('');
+    const router = useRouter();
+    
+
+    function redirectToOG(){
+        if(!localStorage.getItem('redirectURI')) localStorage.setItem('redirectURI','/');
+        console.log(localStorage.getItem('redirectURI'));
+        router.replace(localStorage.getItem('redirectURI')); 
+        localStorage.setItem('redirectURI','');
+    }
 
     return (
         <div className="bg-white shadow-md rounded px-25 pt-6 pb-8 mb-4 flex flex-col justify-center align-center w-500 m-auto items-center">
+            <div>
+                <button className="bg-red-500 text-white font-bold py-2 px-4 rounded mb-5" type="button"
+                onClick = {async () => {
+                    await firebase.auth()
+                    .signInWithPopup(gProvider)
+                    .then((result) => {
+                        console.log(result.user);
+                        redirectToOG();
+                    }).catch((err)=>{
+                        console.log("error verb "+err.message);
+                    })
+                }}
+                >
+                     Sign in with Google
+                </button>
+            </div>
             <div className="mb-4">
                 <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="username">
                     Email address
@@ -30,7 +59,7 @@ export default function Login(){
                     onClick = {async ()=>{
                         await firebase.auth().createUserWithEmailAndPassword(email,pass)
                         .then(function() {
-                            window.location.href = '/'
+                            redirectToOG();
                         }).catch(function(err) {
                             const message = err.message;
                             console.log(message);
@@ -43,7 +72,7 @@ export default function Login(){
                     onClick = {async ()=>{
                         await firebase.auth().signInWithEmailAndPassword(email,pass)
                         .then(function() {
-                            window.location.href = '/'
+                            redirectToOG();
                         }).catch(function(err) {
                             const message = err.message;
                             console.log(message);

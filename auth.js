@@ -1,6 +1,4 @@
 import React,{useState, useEffect, useContext, createContext} from 'react'
-
-import nookies from 'nookies'
 import firebaseClient from './firebaseClient'
 import firebase from 'firebase/app'
 import 'firebase/auth'
@@ -15,12 +13,12 @@ export const AuthProvider = ({children}) => {
         return firebase.auth().onIdTokenChanged(async (user) => {
             if(!user){
                 setUser(null);
-                nookies.set(undefined, 'token', '',{});
+                localStorage.setItem('accessToken','');
                 return;
             }
             const token = await user.getIdToken();
             setUser(user);
-            nookies.set(undefined, 'token', token,{});
+            localStorage.setItem('accessToken',token);
         })
     },[])
 

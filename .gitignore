@@ -37,3 +37,7 @@ firebaseAdmin.js
 
 secrets.json
 
+authenticated.js
+
+withAuth.js
+
